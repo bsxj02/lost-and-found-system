@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.WupinguashiDao">
+
+
+
+
+
+
+
+
+
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.wupinguashi_name as wupinguashiName
+        ,a.shiwuzhaoling_types as shiwuzhaolingTypes
+        ,a.status_types as statusTypes
+        ,a.wupinguashi_photo as wupinguashiPhoto
+        ,a.wupinguashi_time as wupinguashiTime
+        ,a.yonghu_id as yonghuId
+        ,a.wupinguashi_dizhi as wupinguashiDizhi
+        ,a.wupinguashi_content as wupinguashiContent
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.WupinguashiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_photo as yonghuPhoto
+
+        FROM wupinguashi  a
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.wupinguashiName != '' and params.wupinguashiName != null and params.wupinguashiName != 'null' ">
+                and a.wupinguashi_name like CONCAT('%',#{params.wupinguashiName},'%')
+            </if>
+            <if test="params.shiwuzhaolingTypes != null and params.shiwuzhaolingTypes != ''">
+                and a.shiwuzhaoling_types = #{params.shiwuzhaolingTypes}
+            </if>
+            <if test="params.statusTypes != null and params.statusTypes != ''">
+                and a.status_types = #{params.statusTypes}
+            </if>
+            <if test=" params.wupinguashiTimeStart != '' and params.wupinguashiTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.wupinguashi_time) >= UNIX_TIMESTAMP(#{params.wupinguashiTimeStart}) ]]>
+            </if>
+            <if test=" params.wupinguashiTimeEnd != '' and params.wupinguashiTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.wupinguashi_time) <= UNIX_TIMESTAMP(#{params.wupinguashiTimeEnd}) ]]>
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and a.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test=" params.wupinguashiDizhi != '' and params.wupinguashiDizhi != null and params.wupinguashiDizhi != 'null' ">
+                and a.wupinguashi_dizhi like CONCAT('%',#{params.wupinguashiDizhi},'%')
+            </if>
+            <if test=" params.wupinguashiContent != '' and params.wupinguashiContent != null and params.wupinguashiContent != 'null' ">
+                and a.wupinguashi_content like CONCAT('%',#{params.wupinguashiContent},'%')
+            </if>
+
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>

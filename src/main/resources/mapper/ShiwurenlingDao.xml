@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ShiwurenlingDao">
+
+
+
+
+
+
+
+
+
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.shiwuzhaoling_id as shiwuzhaolingId
+        ,a.yonghu_id as yonghuId
+        ,a.yesno_types as yesnoTypes
+        ,a.shiwurenling_text as shiwurenlingText
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ShiwurenlingView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,shiwuzhaoling.shiwuzhaoling_uuid_number as shiwuzhaolingUuidNumber
+        ,shiwuzhaoling.shiwuzhaoling_name as shiwuzhaolingName
+        ,shiwuzhaoling.shiwuzhaoling_types as shiwuzhaolingTypes
+        ,shiwuzhaoling.status_types as statusTypes
+        ,shiwuzhaoling.yonghu_id as shiwuzhaolingYonghuId
+        ,shiwuzhaoling.shiwuzhaoling_photo as shiwuzhaolingPhoto
+        ,shiwuzhaoling.shiwuzhaoling_time as shiwuzhaolingTime
+        ,shiwuzhaoling.shiwuzhaoling_dizhi as shiwuzhaolingDizhi
+        ,shiwuzhaoling.shiwuzhaoling_content as shiwuzhaolingContent
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_photo as yonghuPhoto
+
+        FROM shiwurenling  a
+        left JOIN shiwuzhaoling shiwuzhaoling ON a.shiwuzhaoling_id = shiwuzhaoling.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.shiwuzhaolingId != null and params.shiwuzhaolingId != ''">
+                and a.shiwuzhaoling_id = #{params.shiwuzhaolingId}
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and shiwuzhaoling.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test="params.yesnoTypes != null and params.yesnoTypes != ''">
+                and a.yesno_types = #{params.yesnoTypes}
+            </if>
+            <if test=" params.shiwurenlingText != '' and params.shiwurenlingText != null and params.shiwurenlingText != 'null' ">
+                and a.shiwurenling_text like CONCAT('%',#{params.shiwurenlingText},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+            <if test=" params.shiwuzhaolingUuidNumber != '' and params.shiwuzhaolingUuidNumber != null and params.shiwuzhaolingUuidNumber != 'null' ">
+                and shiwuzhaoling.shiwuzhaoling_uuid_number like CONCAT('%',#{params.shiwuzhaolingUuidNumber},'%')
+            </if>
+            <if test=" params.shiwuzhaolingName != '' and params.shiwuzhaolingName != null and params.shiwuzhaolingName != 'null' ">
+                and shiwuzhaoling.shiwuzhaoling_name like CONCAT('%',#{params.shiwuzhaolingName},'%')
+            </if>
+            <if test="params.shiwuzhaolingTypes != null  and params.shiwuzhaolingTypes != ''">
+                and shiwuzhaoling.shiwuzhaoling_types = #{params.shiwuzhaolingTypes}
+            </if>
+
+            <if test="params.statusTypes != null  and params.statusTypes != ''">
+                and shiwuzhaoling.status_types = #{params.statusTypes}
+            </if>
+
+            <if test=" params.shiwuzhaolingTimeStart != '' and params.shiwuzhaolingTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(shiwuzhaoling.shiwuzhaoling_time) >= UNIX_TIMESTAMP(#{params.shiwuzhaolingTimeStart}) ]]>
+            </if>
+            <if test=" params.shiwuzhaolingTimeEnd != '' and params.shiwuzhaolingTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(shiwuzhaoling.shiwuzhaoling_time) <= UNIX_TIMESTAMP(#{params.shiwuzhaolingTimeEnd}) ]]>
+            </if>
+            <if test=" params.shiwuzhaolingDizhi != '' and params.shiwuzhaolingDizhi != null and params.shiwuzhaolingDizhi != 'null' ">
+                and shiwuzhaoling.shiwuzhaoling_dizhi like CONCAT('%',#{params.shiwuzhaolingDizhi},'%')
+            </if>
+            <if test=" params.shiwuzhaolingContent != '' and params.shiwuzhaolingContent != null and params.shiwuzhaolingContent != 'null' ">
+                and shiwuzhaoling.shiwuzhaoling_content like CONCAT('%',#{params.shiwuzhaolingContent},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
